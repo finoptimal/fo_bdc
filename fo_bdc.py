@@ -120,6 +120,9 @@ class BDCSession(object):
         return self._call(url_tail, **params)
 
     def create(self, object_type, **params):
+        """
+        Remember to put your object into a single-item dictionary with key "obj"
+        """
         return self._crud("Create", object_type, **params)
 
     def read(self, object_type, object_id):
@@ -130,6 +133,8 @@ class BDCSession(object):
         While the object_id param will ultimately get mixed in with the other
          params, it's more parallel with other crud function signatures to have
          it as a separate arg rather than in kwargs...design choice.
+        
+        Remember to put your object into a single-item dictionary with key "obj"
         """
         return self._crud("Update", object_type, id=object_id, **params)
 
@@ -142,6 +147,10 @@ class BDCSession(object):
     def list(self, object_type, start=0, max=999, filters=None, sort=None):
         """
         http://developer.bill.com/api-documentation/api/list
+
+        Yes, I know, the collision of api endpoint "list" and parameter "max"
+         with those reserved Python words is annoying when they get colored in 
+         emacs et al. Sorry...it seemed more important to mirror the endpoints.
         """
         return self._call("List/{}".format(
             object_type), start=start, max=max, filters=filters, sort=sort)
