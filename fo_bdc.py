@@ -1,5 +1,7 @@
 """
-Python bindings for the Bill.com REST API.
+Python bindings for the Bill.com REST API, which is documented here:
+
+http://developer.bill.com/api-documentation/overview/
 
 Please contact developer@finoptimal.com with questions or comments.
 """
@@ -33,27 +35,113 @@ class BDCSession(object):
         self._setup()
 
     def _setup(self):
+        self.si = self.session_id      = None
+        
         if not self.organization_id:
-            resp = self.call("ListOrgs")
-            print resp
-            import ipdb;ipdb.set_trace()
-            
+            orgs = self._call("ListOrgs", data=dict(
+                userName=self.un, password=self.pw))
+            if len(orgs) == 1:
+                self.oi = self.organization_id = orgs[0]["orgId"]
+                print "{} ({}) is {}'s only organization, so".format(
+                    orgs[0]["orgName"], self.oi, self.un), "logging into that."
+                # Now that we've set organization_id...
+                self._setup()
+            else:
+                print "{}'s available BDC Organizations:".format(self.un)
+                print json.dumps(orgs, indent=4)
+                quit()
+                
         else:
-            resp = self.call("Login", devKey=self.organization_id)
-            print resp
-            import ipdb;ipdb.set_trace()
+            rd = self._call("Login", data=dict(
+                userName=self.un, password=self.pw, orgId=self.organization_id))
+            self.si = self.session_id = rd["sessionId"]
+
+            if self.vb > 2:
+                print "Successfully logged into orgId {}.".format(self.oi)
+
+        if not self.si:
+            raise Exception("Not logged into BDC.")
+            
+    def _call(self, url_tail, data=None, **params):
+        """
+        This is a generic wrapper around the requests module, intended to take
+         the basic requirements from the caller, and return what the caller 
+         really wants, which is the response data as a dictionary.
+
+        # TO DO: add retry logic as sometimes a little persistence is required
+        """
+        if not data:
+            data = {}
+
+        data["devKey"] = self.ak
+        
+        if not url_tail in ["Login", "ListOrgs"]:
+            # This goes in every call except these two excluded ones
+            # For those two, more sensitive data is packed into the request
+            #  body via the data parameter.
+            data["sessionId"] = self.si            
+
+        data.update({"data" : json.dumps(params)})
+            
+        full_url  = "{}/{}.json".format(self.BASE_URL, url_tail)
+
+        resp      = requests.post(
+            full_url, headers=self.HEADERS, params=params, data=data)
+
+        rj        = response_json = resp.json()
+
+        if self.vb > 10:
+            print json.dumps(rj, indent=4)
+
+        if not rj["response_message"] == "Success":
+            if self.vb <= 10:
+                print json.dumps(rj, indent=4)
+            raise Exception("See BDC call error above!")
+                
+        rd        = response_data = rj["response_data"]
+        
+        return rd
 
     def logout(self):
-        resp = self.call("Logout")
-        print resp
-        import ipdb;ipdb.set_trace()
+        resp = self._call("Logout")
 
-    def call(self, url_tail, data=None, **params):
-        if not data:
-            data  = {}
-        data_json = json.dumps(data)
-        full_url  = "{}/{}.json".format(self.BASE_URL, url_tail)
-        resp      = requests.post(
-            full_url, headers=self.HEADERS, params=params, data=data_json)
+        if self.vb > 2:
+            print "Successfully logged out of orgId {}.".format(self.oi)
 
-        import ipdb;ipdb.set_trace()
+    def _crud(self, operation, object_type, **params):
+        """
+        available CRUD(U) operations include "create", "read", "update", 
+         "delete", and "undelete". params are required for "create" and 
+         "update", and forbidden for everything else.
+
+        While operation is case-insensitive, object_type is NOT.
+        """
+        url_tail = "Crud/{}/{}".format(operation.title(), object_type)
+        return self._call(url_tail, **params)
+
+    def create(self, object_type, **params):
+        return self._crud("Create", object_type, **params)
+
+    def read(self, object_type, object_id):
+        return self._crud("Read", object_type, id=object_id)
+
+    def update(self, object_type, object_id, **params):
+        """
+        While the object_id param will ultimately get mixed in with the other
+         params, it's more parallel with other crud function signatures to have
+         it as a separate arg rather than in kwargs...design choice.
+        """
+        return self._crud("Update", object_type, id=object_id, **params)
+
+    def delete(self, object_type, object_id):
+        return self._crud("Delete", object_type, id=object_id)
+
+    def undelete(self, object_type, object_id):
+        return self._crud("Undelete", object_type, id=object_id)
+
+    def list(self, object_type, start=0, max=999, filters=None, sort=None):
+        """
+        http://developer.bill.com/api-documentation/api/list
+        """
+        return self._call("List/{}".format(
+            object_type), start=start, max=max, filters=filters, sort=sort)
