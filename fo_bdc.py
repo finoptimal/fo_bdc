@@ -149,7 +149,7 @@ class BDCSession(object):
         http://developer.bill.com/api-documentation/api/list
 
         Yes, I know, the collision of api endpoint "list" and parameter "max"
-         with those reserved Python words is annoying when they get colored in 
+         with those reserved Python words is annoying when they get colored by 
          emacs et al. Sorry...it seemed more important to mirror the endpoints.
         """
         return self._call("List/{}".format(
