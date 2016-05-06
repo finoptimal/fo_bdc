@@ -61,7 +61,7 @@ class BDCSession(object):
 
         if not self.si:
             raise Exception("Not logged into BDC.")
-            
+        
     def _call(self, url_tail, data=None, **params):
         """
         This is a generic wrapper around the requests module, intended to take

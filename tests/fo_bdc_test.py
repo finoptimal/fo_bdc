@@ -28,7 +28,7 @@ parser.add_argument("-k", "--api_key",
 parser.add_argument("-O", "--logout", 
                     action="store_false",
                     default=True,
-                    help="logout when done")
+                    help="DON'T logout when done")
 
 parser.add_argument("-l", "--list",
                     type=str,
