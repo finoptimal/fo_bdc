@@ -86,20 +86,20 @@ class BDCSession(object):
         full_url  = "{}/{}.json".format(self.BASE_URL, url_tail)
 
         resp      = requests.post(
-            full_url, headers=self.HEADERS, params=params, data=data)
+            full_url, headers=self.HEADERS, data=data)
 
         rj        = response_json = resp.json()
 
-        if self.vb > 10:
+        if self.vb > 5:
             print json.dumps(rj, indent=4)
 
         if not rj["response_message"] == "Success":
-            if self.vb <= 10:
+            if self.vb <= 5:
                 print json.dumps(rj, indent=4)
             raise Exception("See BDC call error above!")
                 
         rd        = response_data = rj["response_data"]
-        
+
         return rd
 
     def logout(self):
@@ -154,3 +154,9 @@ class BDCSession(object):
         """
         return self._call("List/{}".format(
             object_type), start=start, max=max, filters=filters, sort=sort)
+
+    def current_time(self):
+        """
+        Sometimes it's useful to know what time the API thinks it currently is.
+        """
+        return self._call("CurrentTime")["currentTime"]
