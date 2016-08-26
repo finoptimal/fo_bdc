@@ -6,5 +6,5 @@ setup(name='fo_bdc',
       description='Wrapper around Bill.com API',
       # Note that the tests folder can only be 1 level deep!!! 
       scripts=glob('tests/*'),
-      py_modules=["fo_bdc"],
+      py_modules=[],
       packages=find_packages())
