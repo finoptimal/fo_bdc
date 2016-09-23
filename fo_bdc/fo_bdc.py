@@ -26,25 +26,25 @@ class BDCSession(object):
         Increased verbosity will, as it's name implies, make the session more
         communicative, or annoying, as the case may be. Season to taste.
         """
-        self.un = self.username        = username
-        self.pw = self.password        = password
-        self.ak = self.api_key         = api_key
-        self.oi = self.organization_id = organization_id
-        self.vb = self.verbosity       = verbosity
+        self.un = username
+        self.pw = password
+        self.ak = api_key
+        self.oi = organization_id
+        self.vb = verbosity
         
         self._setup()
 
     def _setup(self):
         self.si = self.session_id      = None
         
-        if not self.organization_id:
+        if not self.oi:
             orgs = self._call("ListOrgs", data=dict(
                 userName=self.un, password=self.pw))
             if len(orgs) == 1:
-                self.oi = self.organization_id = orgs[0]["orgId"]
+                self.oi = self.oi = orgs[0]["orgId"]
                 print "{} ({}) is {}'s only organization, so".format(
                     orgs[0]["orgName"], self.oi, self.un), "logging into that."
-                # Now that we've set organization_id...
+                # Now that we've set oi...
                 self._setup()
             else:
                 print "{}'s available BDC Organizations:".format(self.un)
@@ -53,7 +53,7 @@ class BDCSession(object):
                 
         else:
             rd = self._call("Login", data=dict(
-                userName=self.un, password=self.pw, orgId=self.organization_id))
+                userName=self.un, password=self.pw, orgId=self.oi))
             self.si = self.session_id = rd["sessionId"]
 
             if self.vb > 2:
