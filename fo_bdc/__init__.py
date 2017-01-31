@@ -1,1 +1,1 @@
-from fo_bdc import *
+from bdcsession import *
