@@ -62,7 +62,7 @@ class BDCSession(object):
         if not self.si:
             raise Exception("Not logged into BDC.")
         
-    def _call(self, url_tail, data=None, **params):
+    def _call(self, url_tail, data=None, suppress_errors=False, **params):
         """
         This is a generic wrapper around the requests module, intended to take
          the basic requirements from the caller, and return what the caller 
@@ -94,9 +94,8 @@ class BDCSession(object):
             print json.dumps(rj, indent=4)
 
         if not rj["response_message"] == "Success":
-            if self.vb <= 5:
+            if not suppress_errors:
                 print json.dumps(rj, indent=4)
-            raise Exception("See BDC call error above!")
                 
         rd        = response_data = rj["response_data"]
 
@@ -128,7 +127,7 @@ class BDCSession(object):
     def read(self, object_type, object_id):
         return self._crud("Read", object_type, id=object_id)
 
-    def update(self, object_type, object_id, **params):
+    def update(self, object_type, object_id=None, **params):
         """
         While the object_id param will ultimately get mixed in with the other
          params, it's more parallel with other crud function signatures to have
@@ -136,6 +135,10 @@ class BDCSession(object):
         
         Remember to put your object into a single-item dictionary with key "obj"
         """
+        params_id = params.get("obj", {}).get("id")
+        if params_id:
+            # we don't want to effectively pass in two id params
+            object_id = None
         return self._crud("Update", object_type, id=object_id, **params)
 
     def delete(self, object_type, object_id):
@@ -144,7 +147,8 @@ class BDCSession(object):
     def undelete(self, object_type, object_id):
         return self._crud("Undelete", object_type, id=object_id)
 
-    def list(self, object_type, start=0, max=999, filters=None, sort=None):
+    def list(self, object_type, start=0, max=999, filters=None, sort=None,
+             suppress_errors=False):
         """
         http://developer.bill.com/api-documentation/api/list
 
@@ -153,7 +157,8 @@ class BDCSession(object):
          emacs et al. Sorry...it seemed more important to mirror the endpoints.
         """
         return self._call("List/{}".format(
-            object_type), start=start, max=max, filters=filters, sort=sort)
+            object_type), start=start, max=max, filters=filters, sort=sort,
+                          suppress_errors=suppress_errors)
 
     def current_time(self):
         """
