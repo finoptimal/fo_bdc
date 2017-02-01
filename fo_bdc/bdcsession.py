@@ -167,6 +167,7 @@ class BDCSession(object):
         Yes, I know, the collision of api endpoint "list" and parameter "max"
          with those reserved Python words is annoying when they get colored by 
          emacs et al. Sorry...it seemed more important to mirror the endpoints.
+         Hopefully there aren't downsides to the collision I'm not aware of.
         """
         return self._call("List/{}".format(
             object_type), start=start, max=max, filters=filters, sort=sort,
