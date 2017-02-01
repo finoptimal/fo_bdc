@@ -118,16 +118,21 @@ class BDCSession(object):
         url_tail = "Crud/{}/{}".format(operation.title(), object_type)
         return self._call(url_tail, **params)
 
-    def create(self, object_type, **params):
+    def create(self, object_type, obj=None, **params):
         """
         Remember to put your object into a single-item dictionary with key "obj"
         """
+        if not params.get("obj"):
+            if obj:
+                params = {"obj" : obj}
+            else:
+                params = {"obj" : params.copy()}
         return self._crud("Create", object_type, **params)
 
     def read(self, object_type, object_id):
         return self._crud("Read", object_type, id=object_id)
 
-    def update(self, object_type, object_id=None, **params):
+    def update(self, object_type, object_id=None, obj=None, **params):
         """
         While the object_id param will ultimately get mixed in with the other
          params, it's more parallel with other crud function signatures to have
@@ -135,10 +140,17 @@ class BDCSession(object):
         
         Remember to put your object into a single-item dictionary with key "obj"
         """
-        params_id = params.get("obj", {}).get("id")
-        if params_id:
-            # we don't want to effectively pass in two id params
-            object_id = None
+        if not params.get("obj"):
+            if obj:
+                params = {"obj" : obj}
+            else:
+                params = {"obj" : params.copy()}
+
+        object_id = params["obj"].get("id")
+        if not object_id:
+            print params
+            raise Exception("Need existing object id in order to update!")
+        
         return self._crud("Update", object_type, id=object_id, **params)
 
     def delete(self, object_type, object_id):
