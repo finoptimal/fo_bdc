@@ -56,7 +56,7 @@ class BDCSession(object):
                 userName=self.un, password=self.pw, orgId=self.oi))
             self.si = self.session_id = rd["sessionId"]
 
-            if self.vb > 2:
+            if self.vb > 7:
                 print "Successfully logged into orgId {}.".format(self.oi)
 
         if not self.si:
@@ -90,7 +90,7 @@ class BDCSession(object):
 
         rj        = response_json = resp.json()
 
-        if self.vb > 5:
+        if self.vb > 7:
             print json.dumps(rj, indent=4)
 
         if not rj["response_message"] == "Success":
@@ -104,7 +104,7 @@ class BDCSession(object):
     def logout(self):
         resp = self._call("Logout")
 
-        if self.vb > 2:
+        if self.vb > 7:
             print "Successfully logged out of orgId {}.".format(self.oi)
 
     def _crud(self, operation, object_type, **params):
