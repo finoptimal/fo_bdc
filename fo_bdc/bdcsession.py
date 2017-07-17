@@ -6,7 +6,7 @@ http://developer.bill.com/api-documentation/overview/
 Please contact developer@finoptimal.com with questions or comments.
 """
 
-import json, requests
+import json, os, requests
 
 class BDCSession(object):
     """
@@ -81,13 +81,13 @@ class BDCSession(object):
             #  body via the data parameter.
             data["sessionId"] = self.si            
 
+        # We just put all the params in the request body...
         data.update({"data" : json.dumps(params)})
             
         full_url  = "{}/{}.json".format(self.BASE_URL, url_tail)
 
-        resp      = requests.post(
-            full_url, headers=self.HEADERS, data=data)
-
+        resp  = requests.post(full_url, headers=self.HEADERS, data=data)
+            
         rj        = response_json = resp.json()
 
         if self.vb > 7:
@@ -96,6 +96,9 @@ class BDCSession(object):
         if not rj["response_message"] == "Success":
             if not suppress_errors:
                 print json.dumps(rj, indent=4)
+            if self.vb > 5:
+                print "Inspect full_url, data, rj:"
+                import ipdb;ipdb.set_trace()        
                 
         rd        = response_data = rj["response_data"]
 
@@ -203,5 +206,5 @@ class BDCSession(object):
         if target_id:
             data["id"] = target_id
 
-        return self._call("UploadAttachment", data=data)
+        return self._call("UploadAttachment", **data)
 
