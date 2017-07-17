@@ -178,3 +178,30 @@ class BDCSession(object):
         Sometimes it's useful to know what time the API thinks it currently is.
         """
         return self._call("CurrentTime")["currentTime"]
+
+    def invite_vendor(self, vendor_id, vendor_email):
+        """
+        ...to pay electronically.
+        """
+        params = {
+            "vendorId" : vendor_id,
+            "email"    : vendor_email
+        }
+
+        return self._call('SendVendorInvite', **params)
+
+    def attach_file(self, attachment_path, target_id=None):
+        """
+        If no target_id, document gets added to the Bill.com "Inbox".
+        """
+        data = {
+            "fileName" : os.path.split(attachment_path)[1],
+            "document" : open(attachment_path, "rb").read().encode(
+                "base64").encode('utf-8')
+        }
+        
+        if target_id:
+            data["id"] = target_id
+
+        return self._call("UploadAttachment", data=data)
+
