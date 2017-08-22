@@ -208,3 +208,19 @@ class BDCSession(object):
 
         return self._call("UploadAttachment", **data)
 
+    def clear_approvers(self, object_type, object_id):
+        """
+        https://developer.bill.com/hc/en-us/articles/210138453-ClearApprovers
+        """
+        return self._call(
+            "ClearApprovers", entity=object_type, objectId=object_id)
+
+    def set_approvers(self, object_type, object_id, user_ids):
+        """
+        https://developer.bill.com/hc/en-us/articles/210138853-SetApprovers
+
+        user_ids should be a list; the first two params should be strings
+        """
+        return self._call("SetApprovers",
+                          entity=object_type, objectId=object_id,
+                          approvers=user_ids)
