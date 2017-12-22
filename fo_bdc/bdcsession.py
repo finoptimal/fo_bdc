@@ -224,3 +224,35 @@ class BDCSession(object):
         return self._call("SetApprovers",
                           entity=object_type, objectId=object_id,
                           approvers=user_ids)
+    def record_ar_payment(self, obj=None, **params):
+        """
+        https://developer.bill.com/hc/en-us/articles/213911106-RecordARPayment
+        """
+        if obj:
+            if len(params) > 0:
+                raise Exception("Don't provide both obj and params!")
+            params = obj.copy()
+            
+        return self._call("RecordARPayment", **params)
+
+    def set_customer_authorization(self, customer_id):
+        """
+        WARNING -- THIS ENABLES YOU TO ACTUALLY MOVE MONEY...REALLY BE 
+         AUTHORIZED BEFORE MAKING THIS CALL!
+        """
+        return self._call("SetCustomerAuthorization",
+                          customerId=customer_id,
+                          hasAuthorizedToCharge=True)
+    
+    def charge_customer(self, obj=None, **params):
+        """
+        WARNING -- THIS ACTUALLY MOVES MONEY
+
+        https://developer.bill.com/hc/en-us/articles/215407243-ChargeCustomer
+        """
+        if obj:
+            if len(params) > 0:
+                raise Exception("Don't provide both obj and params!")
+            params = obj.copy()
+            
+        return self._call("ChargeCustomer", **params)
