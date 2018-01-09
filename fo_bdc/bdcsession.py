@@ -6,7 +6,7 @@ http://developer.bill.com/api-documentation/overview/
 Please contact developer@finoptimal.com with questions or comments.
 """
 
-import json, os, requests
+import copy, json, os, requests
 
 class BDCSession(object):
     """
@@ -127,9 +127,10 @@ class BDCSession(object):
         """
         if not params.get("obj"):
             if obj:
-                params = {"obj" : obj}
+                params.update({"obj" : obj})
             else:
-                params = {"obj" : params.copy()}
+                params = {"obj" : copy.deepcopy(params)}
+                
         return self._crud("Create", object_type, **params)
 
     def read(self, object_type, object_id):
