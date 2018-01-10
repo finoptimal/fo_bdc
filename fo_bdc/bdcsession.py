@@ -6,7 +6,7 @@ http://developer.bill.com/api-documentation/overview/
 Please contact developer@finoptimal.com with questions or comments.
 """
 
-import json, os, requests
+import copy, json, os, requests
 
 class BDCSession(object):
     """
@@ -127,9 +127,10 @@ class BDCSession(object):
         """
         if not params.get("obj"):
             if obj:
-                params = {"obj" : obj}
+                params.update({"obj" : obj})
             else:
-                params = {"obj" : params.copy()}
+                params = {"obj" : copy.deepcopy(params)}
+                
         return self._crud("Create", object_type, **params)
 
     def read(self, object_type, object_id):
@@ -236,3 +237,35 @@ class BDCSession(object):
         return self._call("SetApprovers",
                           entity=object_type, objectId=object_id,
                           approvers=user_ids)
+    def record_ar_payment(self, obj=None, **params):
+        """
+        https://developer.bill.com/hc/en-us/articles/213911106-RecordARPayment
+        """
+        if obj:
+            if len(params) > 0:
+                raise Exception("Don't provide both obj and params!")
+            params = obj.copy()
+            
+        return self._call("RecordARPayment", **params)
+
+    def set_customer_authorization(self, customer_id):
+        """
+        WARNING -- THIS ENABLES YOU TO ACTUALLY MOVE MONEY...REALLY BE 
+         AUTHORIZED BEFORE MAKING THIS CALL!
+        """
+        return self._call("SetCustomerAuthorization",
+                          customerId=customer_id,
+                          hasAuthorizedToCharge=True)
+    
+    def charge_customer(self, obj=None, **params):
+        """
+        WARNING -- THIS ACTUALLY MOVES MONEY
+
+        https://developer.bill.com/hc/en-us/articles/215407243-ChargeCustomer
+        """
+        if obj:
+            if len(params) > 0:
+                raise Exception("Don't provide both obj and params!")
+            params = obj.copy()
+            
+        return self._call("ChargeCustomer", **params)
