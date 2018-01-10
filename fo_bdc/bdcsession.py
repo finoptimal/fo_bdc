@@ -215,6 +215,18 @@ class BDCSession(object):
         return self._call(
             "ClearApprovers", entity=object_type, objectId=object_id)
 
+    def list_user_approvals(self, user_id, object_type, approval_type,
+                            marker, max=999, nested=False):
+        """
+        https://developer.bill.com/hc/en-us/articles/214115986-ListUserApprovals
+
+        To Do: Implement sort, filters, and related...
+        """
+        return self._call("ListUserApprovals",
+                          usersId=user_id, entity=object_type,
+                          approvalType=approval_type, marker=marker,
+                          max=max, nested=nested)
+    
     def set_approvers(self, object_type, object_id, user_ids):
         """
         https://developer.bill.com/hc/en-us/articles/210138853-SetApprovers
