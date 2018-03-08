@@ -269,3 +269,17 @@ class BDCSession(object):
             params = obj.copy()
             
         return self._call("ChargeCustomer", **params)
+
+    def send_invoice(self, obj=None, **params):
+        """
+        WARNING -- THIS SENDS EMAILS TO BILL.COM CUSTOMERS!!!
+
+        https://developer.bill.com/hc/en-us/articles/208197236-SendInvoice
+        """
+        if obj:
+            if len(params) > 0:
+                raise Exception("Don't provide both obj and params!")
+            params = obj.copy()
+            
+        return self._call("SendInvoice", **params)
+
