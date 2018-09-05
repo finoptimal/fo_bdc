@@ -87,8 +87,9 @@ class BDCSession(object):
         full_url  = "{}/{}.json".format(self.BASE_URL, url_tail)
 
         resp  = requests.post(full_url, headers=self.HEADERS, data=data)
-            
-        rj        = response_json = resp.json()
+
+        # Response Json
+        rj = resp.json()
 
         if self.vb > 7:
             print json.dumps(rj, indent=4)
@@ -99,8 +100,12 @@ class BDCSession(object):
             if self.vb > 5:
                 print "Inspect full_url, data, rj:"
                 import ipdb;ipdb.set_trace()        
+
+        # For troubleshooting...
+        self.last_response = rj.copy()
                 
-        rd        = response_data = rj["response_data"]
+        # Response Data
+        rd = rj["response_data"]
 
         return rd
 
