@@ -5,7 +5,9 @@ http://developer.bill.com/api-documentation/overview/
 
 Please contact developer@finoptimal.com with questions or comments.
 """
+from __future__ import print_function
 
+from builtins import object
 import copy, json, os, requests
 
 class BDCSession(object):
@@ -42,13 +44,13 @@ class BDCSession(object):
                 userName=self.un, password=self.pw))
             if len(orgs) == 1:
                 self.oi = self.oi = orgs[0]["orgId"]
-                print "{} ({}) is {}'s only organization, so".format(
-                    orgs[0]["orgName"], self.oi, self.un), "logging into that."
+                print("{} ({}) is {}'s only organization, so".format(
+                    orgs[0]["orgName"], self.oi, self.un), "logging into that.")
                 # Now that we've set oi...
                 self._setup()
             else:
-                print "{}'s available BDC Organizations:".format(self.un)
-                print json.dumps(orgs, indent=4)
+                print("{}'s available BDC Organizations:".format(self.un))
+                print(json.dumps(orgs, indent=4))
                 quit()
                 
         else:
@@ -57,7 +59,7 @@ class BDCSession(object):
             self.si = self.session_id = rd["sessionId"]
 
             if self.vb > 7:
-                print "Successfully logged into orgId {}.".format(self.oi)
+                print("Successfully logged into orgId {}.".format(self.oi))
 
         if not self.si:
             raise Exception("Not logged into BDC.")
@@ -92,13 +94,13 @@ class BDCSession(object):
         rj = resp.json()
 
         if self.vb > 7:
-            print json.dumps(rj, indent=4)
+            print(json.dumps(rj, indent=4))
 
         if not rj["response_message"] == "Success":
             if not suppress_errors:
-                print json.dumps(rj, indent=4)
+                print(json.dumps(rj, indent=4))
             if self.vb > 5:
-                print "Inspect full_url, data, rj:"
+                print("Inspect full_url, data, rj:")
                 import ipdb;ipdb.set_trace()        
 
         # For troubleshooting...
@@ -113,7 +115,7 @@ class BDCSession(object):
         resp = self._call("Logout")
 
         if self.vb > 7:
-            print "Successfully logged out of orgId {}.".format(self.oi)
+            print("Successfully logged out of orgId {}.".format(self.oi))
 
     def _crud(self, operation, object_type, **params):
         """
@@ -157,7 +159,7 @@ class BDCSession(object):
 
         object_id = params["obj"].get("id")
         if not object_id:
-            print params
+            print(params)
             raise Exception("Need existing object id in order to update!")
         
         return self._crud("Update", object_type, id=object_id, **params)
@@ -199,14 +201,15 @@ class BDCSession(object):
 
         return self._call('SendVendorInvite', **params)
 
-    def attach_file(self, attachment_path, target_id=None):
+    def attach_file(self, attachment_path, target_id=None, is_public=False):
         """
         If no target_id, document gets added to the Bill.com "Inbox".
         """
         data = {
             "fileName" : os.path.split(attachment_path)[1],
             "document" : open(attachment_path, "rb").read().encode(
-                "base64").encode('utf-8')
+                "base64").encode('utf-8'),
+            "isPublic" : is_public,
         }
         
         if target_id:
@@ -288,3 +291,8 @@ class BDCSession(object):
             
         return self._call("SendInvoice", **params)
 
+    def get_entity_metadata(self, object_types):
+        """
+        https://developer.bill.com/hc/en-us/articles/210138323-GetEntityMetadata
+        """
+        return self._call("GetEntityMetadata", entity=object_types) 
