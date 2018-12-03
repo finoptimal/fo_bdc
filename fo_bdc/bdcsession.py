@@ -97,7 +97,7 @@ class BDCSession(object):
             print(json.dumps(rj, indent=4))
 
         if not rj["response_message"] == "Success":
-            if not suppress_errors:
+            if not suppress_errors and self.vb > 0:
                 print(json.dumps(rj, indent=4))
             if self.vb > 5:
                 print("Inspect full_url, data, rj:")
@@ -159,8 +159,10 @@ class BDCSession(object):
 
         object_id = params["obj"].get("id")
         if not object_id:
-            print(params)
-            raise Exception("Need existing object id in order to update!")
+            msg = "{}; params:{}".format(
+                "Need existing object id in order to update!",
+                json.dumps(params))
+            raise Exception(msg)
         
         return self._crud("Update", object_type, id=object_id, **params)
 
