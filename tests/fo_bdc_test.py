@@ -57,11 +57,11 @@ if __name__=='__main__':
 
     if args.read:
         rd = sesh.read(*args.read)
-        print rd
+        print(rd)
 
     if args.list:
         rd = sesh.list(*args.list)
-        print json.dumps(rd, indent=4)        
+        print(json.dumps(rd, indent=4))        
 
     if args.logout:
         sesh.logout()
@@ -69,4 +69,4 @@ if __name__=='__main__':
     end = time.time()
 
     if args.verbosity > 0:
-        print "Running time: {:.2f} seconds.".format(end-start)
+        print("Running time: {:.2f} seconds.".format(end-start))
