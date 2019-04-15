@@ -209,6 +209,7 @@ class BDCSession(object):
         data = {
             "fileName" : os.path.split(attachment_path)[1],
             "document" : open(attachment_path, "rb").read().encode(
+                # This has to change in Py3
                 "base64").encode('utf-8'),
             "isPublic" : is_public,
         }
