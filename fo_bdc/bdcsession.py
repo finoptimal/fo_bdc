@@ -5,9 +5,8 @@ http://developer.bill.com/api-documentation/overview/
 
 Please contact developer@finoptimal.com with questions or comments.
 """
+from base64      import b64encode
 
-
-from builtins import object
 import copy, json, os, requests
 
 class BDCSession(object):
@@ -209,8 +208,8 @@ class BDCSession(object):
         """
         data = {
             "fileName" : os.path.split(attachment_path)[1],
-            "document" : open(attachment_path, "rb").read().encode(
-                "base64").encode('utf-8'),
+            "document" : b64encode(open(
+                attachment_path, "rb").read()).decode("utf-8"),
             "isPublic" : is_public,
         }
         
