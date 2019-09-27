@@ -297,9 +297,16 @@ class BDCSession(object):
         return self._call("GetEntityMetadata", entity=object_types) 
 
     def get_disbursement_data(self, sent_pay_id):
+        """
+        https://developer.bill.com/hc/en-us/articles/
+         210138753-GetDisbursementData
+        """
         return self._call("GetDisbursementData", sentPayId=sent_pay_id)
 
     def list_payments(self, disbursement_status, start=0, max=999):
+        """
+        https://developer.bill.com/hc/en-us/articles/115000149163-ListPayments
+        """
         return self._call(
             "ListPayments",
             disbursementStatus=disbursement_status, start=start, max=max)
