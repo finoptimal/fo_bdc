@@ -1,10 +1,8 @@
-"""
-Python bindings for the Bill.com REST API, which is documented here:
+# Python bindings for the Bill.com REST API, which is documented here:
+#  http://developer.bill.com/api-documentation/overview/
 
-http://developer.bill.com/api-documentation/overview/
+# Please contact developer@finoptimal.com with questions or comments.
 
-Please contact developer@finoptimal.com with questions or comments.
-"""
 from base64      import b64encode
 
 import copy, json, os, requests
@@ -297,3 +295,11 @@ class BDCSession(object):
         https://developer.bill.com/hc/en-us/articles/210138323-GetEntityMetadata
         """
         return self._call("GetEntityMetadata", entity=object_types) 
+
+    def get_disbursement_data(self, sent_pay_id):
+        return self._call("GetDisbursementData", sentPayId=sent_pay_id)
+
+    def list_payments(self, disbursement_status, start=0, max=999):
+        return self._call(
+            "ListPayments",
+            disbursementStatus=disbursement_status, start=start, max=max)
