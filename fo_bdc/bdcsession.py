@@ -1,11 +1,9 @@
-"""
-Python bindings for the Bill.com REST API, which is documented here:
+# Python bindings for the Bill.com REST API, which is documented here:
+#  http://developer.bill.com/api-documentation/overview/
 
-http://developer.bill.com/api-documentation/overview/
+# Please contact developer@finoptimal.com with questions or comments.
 
-Please contact developer@finoptimal.com with questions or comments.
-"""
-from __future__ import print_function
+from base64      import b64encode
 
 import copy, json, os, requests
 
@@ -208,9 +206,8 @@ class BDCSession(object):
         """
         data = {
             "fileName" : os.path.split(attachment_path)[1],
-            "document" : open(attachment_path, "rb").read().encode(
-                # This has to change in Py3
-                "base64").encode('utf-8'),
+            "document" : b64encode(open(
+                attachment_path, "rb").read()).decode("utf-8"),
             "isPublic" : is_public,
         }
         
@@ -298,3 +295,18 @@ class BDCSession(object):
         https://developer.bill.com/hc/en-us/articles/210138323-GetEntityMetadata
         """
         return self._call("GetEntityMetadata", entity=object_types) 
+
+    def get_disbursement_data(self, sent_pay_id):
+        """
+        https://developer.bill.com/hc/en-us/articles/
+         210138753-GetDisbursementData
+        """
+        return self._call("GetDisbursementData", sentPayId=sent_pay_id)
+
+    def list_payments(self, disbursement_status, start=0, max=999):
+        """
+        https://developer.bill.com/hc/en-us/articles/115000149163-ListPayments
+        """
+        return self._call(
+            "ListPayments",
+            disbursementStatus=disbursement_status, start=start, max=max)
