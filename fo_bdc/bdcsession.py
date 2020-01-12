@@ -191,7 +191,10 @@ class BDCSession(object):
 
     def invite_vendor(self, vendor_id, vendor_email):
         """
-        ...to pay electronically.
+        https://developer.bill.com/hc/en-us/articles/211428083-SendVendorInvite
+        
+        See also CancelInvite endpoint:
+         https://developer.bill.com/hc/en-us/articles/218380103
         """
         params = {
             "vendorId" : vendor_id,
