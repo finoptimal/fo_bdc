@@ -247,6 +247,18 @@ class BDCSession(object):
         return self._call("SetApprovers",
                           entity=object_type, objectId=object_id,
                           approvers=user_ids)
+    
+    def record_ap_payment(self, obj=None, **params):
+        """
+        https://developer.bill.com/hc/en-us/articles/215407343-RecordAPPayment
+        """
+        if obj:
+            if len(params) > 0:
+                raise Exception("Don't provide both obj and params!")
+            params = obj.copy()
+            
+        return self._call("RecordAPPayment", **params)
+
     def record_ar_payment(self, obj=None, **params):
         """
         https://developer.bill.com/hc/en-us/articles/213911106-RecordARPayment
