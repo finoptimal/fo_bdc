@@ -203,6 +203,16 @@ class BDCSession(object):
 
         return self._call('SendVendorInvite', **params)
 
+    def get_network_status(self, customer_or_vendor_id):
+        """
+        https://developer.bill.com/hc/en-us/articles/213994086        
+        """
+        params = {
+            "id" : customer_or_vendor_id,
+        }
+
+        return self._call('GetNetworkStatus', **params)
+    
     def attach_file(self, attachment_path, target_id=None, is_public=False):
         """
         If no target_id, document gets added to the Bill.com "Inbox".
