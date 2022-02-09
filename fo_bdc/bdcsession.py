@@ -15,7 +15,7 @@ from base64 import b64encode
 from finoptimal.logging import get_logger, get_file_logger, LoggedClass
 
 logger = get_logger(__name__)
-bdc_logger = get_file_logger('bdc')
+api_logger = get_file_logger('api/bdc')
 
 
 class BDCSession(LoggedClass):
@@ -98,7 +98,7 @@ class BDCSession(LoggedClass):
 
         resp = requests.post(full_url, headers=self.HEADERS, data=data)
 
-        bdc_logger.info(f"{resp.__hash__()} - {resp.status_code} {resp.reason} - "
+        api_logger.info(f"{resp.__hash__()} - {resp.status_code} {resp.reason} - "
                         f"{resp.request.method.ljust(4)} {resp.url}")
 
         # Response Json
