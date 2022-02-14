@@ -8,6 +8,7 @@ Copyright 2016-2022 FinOptimal, Inc. All rights reserved.
 """
 import copy
 import json
+import logging
 import os
 import requests
 from base64 import b64encode
@@ -124,12 +125,14 @@ class BDCSession(LoggedClass):
 
         return rd
 
+    @logger.timeit(level=logging.INFO)
     def logout(self):
         resp = self._call("Logout")
 
         if self.vb > 7:
             self.print(f"Successfully logged out of orgId {self.oi}.")
 
+    @logger.timeit(level=logging.INFO)
     def _crud(self, operation, object_type, **params):
         """
         available CRUD(U) operations include "create", "read", "update", 
@@ -141,6 +144,7 @@ class BDCSession(LoggedClass):
         url_tail = f"Crud/{operation.title()}/{object_type}"
         return self._call(url_tail, **params)
 
+    @logger.timeit(level=logging.INFO)
     def create(self, object_type, obj=None, **params):
         """
         Remember to put your object into a single-item dictionary with key "obj"
@@ -153,9 +157,11 @@ class BDCSession(LoggedClass):
 
         return self._crud("Create", object_type, **params)
 
+    @logger.timeit(level=logging.INFO)
     def read(self, object_type, object_id):
         return self._crud("Read", object_type, id=object_id)
 
+    @logger.timeit(level=logging.INFO)
     def update(self, object_type, object_id=None, obj=None, **params):
         """
         While the object_id param will ultimately get mixed in with the other
@@ -177,12 +183,15 @@ class BDCSession(LoggedClass):
 
         return self._crud("Update", object_type, id=object_id, **params)
 
+    @logger.timeit(level=logging.INFO)
     def delete(self, object_type, object_id):
         return self._crud("Delete", object_type, id=object_id)
 
+    @logger.timeit(level=logging.INFO)
     def undelete(self, object_type, object_id):
         return self._crud("Undelete", object_type, id=object_id)
 
+    @logger.timeit(level=logging.INFO)
     def list(self, object_type, start=0, max=999, filters=None, sort=None, suppress_errors=False):
         """
         http://developer.bill.com/api-documentation/api/list
@@ -199,12 +208,14 @@ class BDCSession(LoggedClass):
                           sort=sort,
                           suppress_errors=suppress_errors)
 
+    @logger.timeit(level=logging.INFO)
     def current_time(self):
         """
         Sometimes it's useful to know what time the API thinks it currently is.
         """
         return self._call("CurrentTime")["currentTime"]
 
+    @logger.timeit(level=logging.INFO)
     def invite_vendor(self, vendor_id, vendor_email):
         """
         https://developer.bill.com/hc/en-us/articles/211428083-SendVendorInvite
@@ -219,6 +230,7 @@ class BDCSession(LoggedClass):
 
         return self._call('SendVendorInvite', **params)
 
+    @logger.timeit(level=logging.INFO)
     def get_network_status(self, customer_or_vendor_id):
         """
         https://developer.bill.com/hc/en-us/articles/213994086        
@@ -229,6 +241,7 @@ class BDCSession(LoggedClass):
 
         return self._call('GetNetworkStatus', **params)
 
+    @logger.timeit(level=logging.INFO)
     def attach_file(self, attachment_path, target_id=None, is_public=False):
         """
         If no target_id, document gets added to the Bill.com "Inbox".
@@ -245,6 +258,7 @@ class BDCSession(LoggedClass):
 
         return self._call("UploadAttachment", **data)
 
+    @logger.timeit(level=logging.INFO)
     def clear_approvers(self, object_type, object_id):
         """
         https://developer.bill.com/hc/en-us/articles/210138453-ClearApprovers
@@ -252,6 +266,7 @@ class BDCSession(LoggedClass):
         return self._call(
             "ClearApprovers", entity=object_type, objectId=object_id)
 
+    @logger.timeit(level=logging.INFO)
     def list_user_approvals(self, user_id, object_type, approval_type, marker, max=999, nested=False):
         """
         https://developer.bill.com/hc/en-us/articles/214115986-ListUserApprovals
@@ -266,6 +281,7 @@ class BDCSession(LoggedClass):
                           max=max,
                           nested=nested)
 
+    @logger.timeit(level=logging.INFO)
     def set_approvers(self, object_type, object_id, user_ids):
         """
         https://developer.bill.com/hc/en-us/articles/210138853-SetApprovers
@@ -277,6 +293,7 @@ class BDCSession(LoggedClass):
                           objectId=object_id,
                           approvers=user_ids)
 
+    @logger.timeit(level=logging.INFO)
     def record_ap_payment(self, obj=None, **params):
         """
         https://developer.bill.com/hc/en-us/articles/215407343-RecordAPPayment
@@ -288,6 +305,7 @@ class BDCSession(LoggedClass):
 
         return self._call("RecordAPPayment", **params)
 
+    @logger.timeit(level=logging.INFO)
     def record_ar_payment(self, obj=None, **params):
         """
         https://developer.bill.com/hc/en-us/articles/213911106-RecordARPayment
@@ -299,6 +317,7 @@ class BDCSession(LoggedClass):
 
         return self._call("RecordARPayment", **params)
 
+    @logger.timeit(level=logging.INFO)
     def set_customer_authorization(self, customer_id):
         """
         WARNING -- THIS ENABLES YOU TO ACTUALLY MOVE MONEY...REALLY BE 
@@ -308,6 +327,7 @@ class BDCSession(LoggedClass):
                           customerId=customer_id,
                           hasAuthorizedToCharge=True)
 
+    @logger.timeit(level=logging.INFO)
     def charge_customer(self, obj=None, **params):
         """
         WARNING -- THIS ACTUALLY MOVES MONEY
@@ -321,6 +341,7 @@ class BDCSession(LoggedClass):
 
         return self._call("ChargeCustomer", **params)
 
+    @logger.timeit(level=logging.INFO)
     def send_invoice(self, obj=None, **params):
         """
         WARNING -- THIS SENDS EMAILS TO BILL.COM CUSTOMERS!!!
@@ -334,12 +355,14 @@ class BDCSession(LoggedClass):
 
         return self._call("SendInvoice", **params)
 
+    @logger.timeit(level=logging.INFO)
     def get_entity_metadata(self, object_types):
         """
         https://developer.bill.com/hc/en-us/articles/210138323-GetEntityMetadata
         """
         return self._call("GetEntityMetadata", entity=object_types)
 
+    @logger.timeit(level=logging.INFO)
     def get_disbursement_data(self, sent_pay_id):
         """
         https://developer.bill.com/hc/en-us/articles/
@@ -347,6 +370,7 @@ class BDCSession(LoggedClass):
         """
         return self._call("GetDisbursementData", sentPayId=sent_pay_id)
 
+    @logger.timeit(level=logging.INFO)
     def list_payments(self, disbursement_status, start=0, max=999):
         """
         https://developer.bill.com/hc/en-us/articles/115000149163-ListPayments
