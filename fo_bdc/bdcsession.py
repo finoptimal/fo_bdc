@@ -58,9 +58,12 @@ class BDCSession(LoggedClass):
                 # Now that we've set oi...
                 self._setup()
             else:
-                self.print(f"{self.un}'s available BDC Organizations:")
-                self.print(json.dumps(orgs, indent=4))
-                quit()
+                msg = "\n".join([
+                    f"{self.un}'s available BDC Organizations:",
+                    json.dumps(orgs, indent=4),
+                ])
+                print(msg)
+                raise Exception(msg)
 
         else:
             rd = self._call("Login", data=dict(
