@@ -96,7 +96,7 @@ class BDCSession(object):
         if not rj["response_message"] == "Success":
             if not suppress_errors and self.vb > 0:
                 print(json.dumps(rj, indent=4))
-            if self.vb > 5:
+            if self.vb > 7:
                 print("Inspect full_url, data, rj:")
                 import ipdb;ipdb.set_trace()        
 
