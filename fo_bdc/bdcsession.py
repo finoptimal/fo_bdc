@@ -156,7 +156,25 @@ class BDCSession(LoggedClass):
             else:
                 params = {"obj": copy.deepcopy(params)}
 
+        self.touchless_test()
         return self._crud("Create", object_type, **params)
+
+    @property
+    def touchless_mode(self):
+        if not hasattr(self, "_touchless_mode"):
+            self.touchless_mode = False
+
+        return self._touchless_mode
+
+    @touchless_mode.setter
+    def touchless_mode(self, tm):
+        if not isinstance(tm, bool):
+            raise TypeError(f"Can't set self.touchless_mode to anything but a bool (which {tm} isn't)!")
+        self._touchless_mode = tm
+
+    def touchless_test(self):
+        if self.touchless_mode:
+            raise Exception("Touchless Failure")
 
     @logger.timeit(level=logging.INFO)
     def read(self, object_type, object_id):
@@ -182,14 +200,18 @@ class BDCSession(LoggedClass):
             msg = f"Need existing object id in order to update!; params:{json.dumps(params)}"
             raise Exception(msg)
 
+        self.touchless_test()
+
         return self._crud("Update", object_type, id=object_id, **params)
 
     @logger.timeit(level=logging.INFO)
     def delete(self, object_type, object_id):
+        self.touchless_test()
         return self._crud("Delete", object_type, id=object_id)
 
     @logger.timeit(level=logging.INFO)
     def undelete(self, object_type, object_id):
+        self.touchless_test()
         return self._crud("Undelete", object_type, id=object_id)
 
     @logger.timeit(level=logging.INFO)
@@ -228,7 +250,7 @@ class BDCSession(LoggedClass):
             "vendorId": vendor_id,
             "email": vendor_email
         }
-
+        self.touchless_test()
         return self._call('SendVendorInvite', **params)
 
     @logger.timeit(level=logging.INFO)
@@ -256,7 +278,7 @@ class BDCSession(LoggedClass):
 
         if target_id:
             data["id"] = target_id
-
+        self.touchless_test()
         return self._call("UploadAttachment", **data)
 
     @logger.timeit(level=logging.INFO)
