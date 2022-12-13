@@ -331,11 +331,21 @@ class BDCSession(LoggedClass):
 
     @logger.timeit(**returns)
     def add_note(self, object_id, message, is_public=False):
-        raise NotImplementedError()
+        return self._call(
+            "SendMessage",
+            objectId=object_id,
+            message=message,
+            isPublic=is_public,
+        )
 
     @logger.timeit(**returns)
     def list_notes(self, object_id, start=0, max=999):
-        raise NotImplementedError()
+        return self._call(
+            "ListMessage",
+            objectId=object_id,
+            start=start,
+            max=max,
+        )
 
     @logger.timeit(**returns)
     def record_ap_payment(self, obj=None, **params):
