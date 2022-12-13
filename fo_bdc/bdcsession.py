@@ -330,6 +330,14 @@ class BDCSession(LoggedClass):
         )
 
     @logger.timeit(**returns)
+    def add_note(self, object_id, message, is_public=False):
+        raise NotImplementedError()
+
+    @logger.timeit(**returns)
+    def list_notes(self, object_id, start=0, max=999):
+        raise NotImplementedError()
+
+    @logger.timeit(**returns)
     def record_ap_payment(self, obj=None, **params):
         """
         https://developer.bill.com/hc/en-us/articles/215407343-RecordAPPayment
